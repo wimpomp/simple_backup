@@ -70,7 +70,8 @@ if __name__ == '__main__':
     else:
         latest = ''
 
-    os.makedirs(os.path.join(backup_path_full, args.source[1:]))
+    if run:
+        os.makedirs(os.path.join(backup_path_full, args.source[1:]))
     rsync = 'rsync {} --delete "{}" {} "{}"'.format(args.rsync, os.path.join(args.source, ''), latest,
         os.path.join(backup_path_full, args.source[1:]))
 
