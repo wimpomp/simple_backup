@@ -26,21 +26,21 @@ def weeks(d, n=4):
     l = {}
     for i in d[-7*n:]:
         l[(i.year, i.isocalendar()[1])] = i
-    return list(l.values())
+    return sorted(l.values())[-n:]
 
 
 def months(d, n=12):
     l = {}
-    for i in d[-int(30.4375*n):]:
+    for i in d[-31*n:]:
         l[(i.year, i.month)] = i
-    return list(l.values())
+    return sorted(l.values())[-n:]
 
 
 def years(d, n=10):
     l = {}
-    for i in d[-int(365.25*n):]:
+    for i in d[-366*n:]:
         l[i.year] = i
-    return list(l.values())
+    return sorted(l.values())[-n:]
 
 
 if __name__ == '__main__':
@@ -53,8 +53,8 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--latest', help='name of latest backup', default='latest')
 
     args = parser.parse_args()
-    verbose = args.verbose
     run = not args.dry_run
+    verbose = args.verbose or not run
 
     if not run:
         print('Dry-run: do not actually change anything.')
@@ -88,11 +88,21 @@ if __name__ == '__main__':
     fn = [os.path.split(i)[1] for i in f]
     f = {date(int(j[:4]), int(j[4:6]), int(j[6:8])): i for i, j in zip(f, fn)}
     keys = sorted(list(f.keys()))
+
+    if verbose:
+        print('Keeping these backups:')
+        for fun in (days, weeks, months, years):
+            print('  {}:'.format(fun.__name__))
+            for i in fun(keys):
+                print('    {}'.format(i))
+
     keep = list(set(days(keys) + weeks(keys) + months(keys) + years(keys)))
     keep = {f[i] for i in keep}
     delete = set(f.values()) - keep
     if verbose:
-        print('Deleting old backups: {}'.format(sorted(list(delete))))
+        print('Deleting old backups:')
+        for i in sorted(delete):
+            print(' {}'.format(i))
     if run:
         for i in delete:
             if os.path.exists(i):
