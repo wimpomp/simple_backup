@@ -19,28 +19,19 @@ def dates(sdate):
 
 
 def days(d, n=7):
-    return d[-n:]
+    return sorted({(i.year, i.month, i.day): i for i in d}.values())[-n:]
 
 
 def weeks(d, n=4):
-    l = {}
-    for i in d[-7*n:]:
-        l[(i.year, i.isocalendar()[1])] = i
-    return sorted(l.values())[-n:]
+    return sorted({(i.year, i.isocalendar()[1]): i for i in d}.values())[-n:]
 
 
 def months(d, n=12):
-    l = {}
-    for i in d[-31*n:]:
-        l[(i.year, i.month)] = i
-    return sorted(l.values())[-n:]
+    return sorted({(i.year, i.month): i for i in d}.values())[-n:]
 
 
 def years(d, n=10):
-    l = {}
-    for i in d[-366*n:]:
-        l[i.year] = i
-    return sorted(l.values())[-n:]
+    return sorted({i.year: i for i in d}.values())[-n:]
 
 
 if __name__ == '__main__':
@@ -73,7 +64,7 @@ if __name__ == '__main__':
     if run:
         os.makedirs(os.path.join(backup_path_full, args.source[1:]))
     rsync = 'rsync {} --delete "{}" {} "{}"'.format(args.rsync, os.path.join(args.source, ''), latest,
-        os.path.join(backup_path_full, args.source[1:]))
+                                                    os.path.join(backup_path_full, args.source[1:]))
 
     if verbose:
         print('Running rsync: {}'.format(rsync))
